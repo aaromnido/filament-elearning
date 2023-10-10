@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -45,4 +47,39 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function plans(): BelongsToMany
+    {
+        return $this->belongsToMany(Plan::class)->withPivot('active');
+    }
+
+    public function courses(): BelongsToMany
+    {
+        return $this->belongsToMany(Course::class)->withPivot('completed');
+    }
+
+    public function scopeStudents(Builder $builder): Builder
+    {
+        return $builder->where('role_id', Role::STUDENT);
+    }
+
+    public function scopeTeachers(Builder $builder): Builder
+    {
+        return $builder->where('role_id', Role::TEACHER);
+    }
+
+    public function scopeAdmins(Builder $builder): Builder
+    {
+        return $builder->where('role_id', Role::ADMIN);
+    }
+
+    public function scopeActive(Builder $builder): Builder
+    {
+        return $builder->where('active', true);
+    }
 }
