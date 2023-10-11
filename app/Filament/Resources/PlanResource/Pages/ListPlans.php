@@ -16,4 +16,11 @@ class ListPlans extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            PlanResource\Widgets\PlanOverview::class,
+        ];
+    }
 }
