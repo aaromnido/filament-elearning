@@ -66,7 +66,8 @@ class CourseResource extends Resource
                                         ->required()
                                         ->minLength(6)
                                         ->maxLength(200)
-                                        ->unique(static::getModel(), 'name', ignoreRecord: true)
+                                        //->unique(static::getModel(), 'name', ignoreRecord: true)
+                                        //->unique(\App\Models\Unit::class, 'name', ignoreRecord: true)
                                         ->live(debounce: 500)
                                         ->afterStateUpdated(function (Set $set, ?string $old, ?string $state) {
                                             $set('slug', Str::slug($state));
@@ -122,7 +123,7 @@ class CourseResource extends Resource
                                                 ->required()
                                                 ->minLength(6)
                                                 ->maxLength(200)
-                                                ->unique(static::getModel(), 'name', ignoreRecord: true)
+                                                //->unique(static::getModel(), 'name', ignoreRecord: true)
                                                 ->live(debounce: 500)
                                                 ->afterStateUpdated(function (Set $set, ?string $old, ?string $state) {
                                                     $set('slug', Str::slug($state));
@@ -211,7 +212,7 @@ class CourseResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //RelationManagers\StudentsRelationManager::class,
+            RelationManagers\StudentsRelationManager::class,
         ];
     }
 

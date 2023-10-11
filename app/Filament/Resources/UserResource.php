@@ -33,136 +33,107 @@ class UserResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('Usuarios');
-    }    
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-
                 FileUpload::make('avatar')
                     ->image()
                     ->disk('public')
                     ->directory('avatars')
                     ->label(__('Avatar'))
                     ->columnSpanFull(),
-
-                    Grid::make(3)
-
-                        ->schema([
-
-                            Select::make('role_id')
-                                ->relationship('role', 'description')
-                                ->required()
-                                ->label(__('Rol')),
-
-                            TextInput::make('name')
-                                ->autofocus()
-                                ->required()
-                                ->maxLength(200)
-                                ->label(__('Nombre')),
-
-                            TextInput::make('email')
-                                ->email()
-                                ->required()
-                                ->maxLength(200)
-                                ->unique(static::getModel(), 'email', ignoreRecord: true)
-                                ->label(__('Correo electrónico')),
-                        ]),
-
-                        TextInput::make('password')
-                            ->password()
-                            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                            ->dehydrated(fn ($state) => filled($state))
-                            ->required(fn (string $context): bool => $context === 'create')
-                            ->confirmed()
-                            ->minLength(8)
+                Grid::make(3)
+                    ->schema([
+                        Select::make('role_id')
+                            ->relationship('role', 'description')
+                            ->required()
+                            ->label(__('Rol')),
+                        TextInput::make('name')
+                            ->autofocus()
+                            ->required()
                             ->maxLength(200)
-                            ->label(__('Contraseña')),
-
-                        TextInput::make('password_confirmation')
-                            ->password()
-                            ->label(__('Confirmar contraseña')),
-
-                        Checkbox::make('active')
-                            ->label(__('Activo')),
+                            ->label(__('Nombre')),
+                        TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->maxLength(200)
+                            ->unique(static::getModel(), 'email', ignoreRecord: true)
+                            ->label(__('Correo electrónico')),
+                    ]),
+                TextInput::make('password')
+                    ->password()
+                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->required(fn (string $context): bool => $context === 'create')
+                    ->confirmed()
+                    ->minLength(8)
+                    ->maxLength(200)
+                    ->label(__('Contraseña')),
+                TextInput::make('password_confirmation')
+                    ->password()
+                    ->label(__('Confirmar contraseña')),
+                Checkbox::make('active')
+                    ->label(__('Activo')),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-
-        ->columns([
-
-            Tables\Columns\ImageColumn::make('avatar')
-                ->label(__('Avatar')),
-
-            Tables\Columns\TextColumn::make('name')
-                ->label(__('Nombre'))
-                ->sortable()
-                ->searchable()
-                ->description(fn (User $user) => $user->email),
-            
-            Tables\Columns\TextColumn::make('role_id')
-                ->label(__('Rol'))
-                ->sortable()
-                ->badge()
-                ->state(fn (User $user) => $user->role->description)
-                ->color(fn (User $user) => match ($user->role_id) {
-                    Role::ADMIN => 'danger',
-                    Role::TEACHER => 'warning',
-                    Role::STUDENT => 'success',
-                }),
-
-            Tables\Columns\ToggleColumn::make('active')
-                ->label(__('Activo'))
-                ->sortable(),
-
-            Tables\Columns\TextColumn::make('created_at')
-                ->label(__('Creado'))
-                ->sortable()
-                ->date('d/m/Y H:i'),
-
-        ])
-
-        ->filters([
-
-            Tables\Filters\SelectFilter::make('role_id')
-                ->label(__('Rol'))
-                ->options(Role::pluck('description', 'id')->toArray()),
-
-        ])
-
-        ->actions([
-
-            Tables\Actions\EditAction::make(),
-
-        ])
-
-        ->bulkActions([
-
-            Tables\Actions\BulkActionGroup::make([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]),
-
-        ])
-
-        ->emptyStateActions([
-
-            Tables\Actions\CreateAction::make(),
-
-        ]);
-        
+            ->columns([
+                Tables\Columns\ImageColumn::make('avatar')
+                    ->label(__('Avatar')),
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('Nombre'))
+                    ->sortable()
+                    ->searchable()
+                    ->description(fn (User $user) => $user->email),
+                Tables\Columns\TextColumn::make('role_id')
+                    ->label(__('Rol'))
+                    ->sortable()
+                    ->badge()
+                    ->state(fn (User $user) => $user->role->description)
+                    ->color(fn (User $user) => match ($user->role_id) {
+                        Role::ADMIN => 'danger',
+                        Role::TEACHER => 'warning',
+                        Role::STUDENT => 'success',
+                    }),
+                Tables\Columns\ToggleColumn::make('active')
+                    ->label(__('Activo'))
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('Creado'))
+                    ->sortable()
+                    ->date('d/m/Y H:i'),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('role_id')
+                    ->label(__('Rol'))
+                    ->options(Role::pluck('description', 'id')->toArray()),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ])
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make(),
+            ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             PlansRelationManager::class,
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -170,5 +141,5 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
-    }    
+    }
 }

@@ -1,19 +1,26 @@
 <?php
 
-namespace App\Filament\Resources\UserResource\RelationManagers;
+namespace App\Filament\Resources\CourseResource\RelationManagers;
 
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-class PlansRelationManager extends RelationManager
+class StudentsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'plans';
+    protected static string $relationship = 'students';
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return __('Planes del usuario :user', ['user' => $ownerRecord->name]);
+        return __('Estudiantes en el curso :course', ['course' => $ownerRecord->name]);
+    }
+
+    protected static function getRecordLabel(): ?string
+    {
+        return __('Estudiante');
     }
 
     public function table(Table $table): Table
@@ -23,12 +30,12 @@ class PlansRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Nombre')),
-                Tables\Columns\ToggleColumn::make('pivot.active')
-                    ->label(__('Activo'))
-                    ->updateStateUsing(function ($record, $state) {
-                        $record->pivot->active = $state;
-                        $record->pivot->save();
-                    }),
+                Tables\Columns\TextColumn::make('pivot.completed')
+                    ->label(__('Completado'))
+                    ->alignCenter()
+                    ->badge()
+                    ->state(fn (Model $record) => $record->pivot->completed ? __('Sí') : __('No'))
+                    ->color(fn (Model $record) => $record->pivot->completed ? 'success' : 'danger'),
             ])
             ->filters([
                 //
@@ -47,6 +54,6 @@ class PlansRelationManager extends RelationManager
             ->emptyStateActions([
                 Tables\Actions\AttachAction::make(),
             ])
-            ->emptyStateDescription(__('Este usuario no tiene planes actualmente'));
+            ->emptyStateDescription(__('No hay estudiantes en este curso todavía'));
     }
 }
